@@ -1,0 +1,25 @@
+{
+  "name": "projekt-spiewak-team",
+  "version": "1.0.0",
+  "description": "Grupowy projekt na Aplikacje Internetowe polegający na stworzeniu witryny i podstawowej dokumentacji.",
+  "main": "app.js",
+  "scripts": {
+    "test": "none (manual tests)"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aleksy66366/projekt-Spiewak-team.git"
+  },
+  "author": "Aleksander Śpiewak, Krystian Krawczak, Krzysztof Piasecki, Oliwer Mazur",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aleksy66366/projekt-Spiewak-team/issues"
+  },
+  "homepage": "https://github.com/aleksy66366/projekt-Spiewak-team#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "path": "^0.12.7",
+    "sqlite3": "^5.1.7-rc.0"
+  }
+}
