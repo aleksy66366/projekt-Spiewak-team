@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edycja Lekcji i Tekstów</title>
+    <link rel="stylesheet" href="editLesson.css">
+</head>
+<body>
+<h1>Edycja Lekcji i Tekstów</h1>
+
+<div>
+    <h2>Lekcje</h2>
+    <select id="lessonSelect" onchange="loadTexts()">
+        <!-- Opcje lekcji będą załadowane tutaj -->
+    </select>
+    <input type="text" id="lessonTitle" placeholder="Tytuł lekcji">
+    <button onclick="addLesson()">Dodaj Lekcję</button>
+    <button onclick="editLessons()">Edytuj Lekcję</button>
+    <button onclick="deleteLesson()">Usuń Lekcję</button>
+</div>
+
+<div>
+    <h2>Teksty</h2>
+    <select id="textSelect" onchange="loadText()">
+        <!-- Opcje tekstów będą załadowane tutaj -->
+    </select>
+    <input type="text" id="textTitle" placeholder="Tytuł tekstu">
+    <textarea id="textContent" placeholder="Tekst"></textarea>
+    <button onclick="addText()">Dodaj Tekst</button>
+    <button onclick="editText()">Edytuj Tekst</button>
+    <button onclick="deleteText()">Usuń Tekst</button>
+</div>
+
+<script>
+    // Ładowanie lekcji przy otwieraniu strony
+    window.onload = loadLessons;
+
+    function loadLessons() {
+        fetch('/all-lessons')
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById('lessonSelect');
+                select.innerHTML = '<option value="">Wybierz lekcję...</option>';
+                data.forEach(lesson => {
+                    select.innerHTML += `<option value="${lesson.lessons_id}">${lesson.lesson_name}</option>`;
+                });
+            });
+    }
+
+    function loadSelectedLesson() {
+        const lessonId = document.getElementById('lessonSelect').value;
+        if (!lessonId) return;
+
+        fetch(`/get-lesson/${lessonId}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('lessonTitle').value = data.lesson_name;
+                // Możesz tutaj załadować więcej danych o lekcji, jeśli są dostępne
+            })
+            .catch(error => {
+                console.error('Błąd podczas ładowania lekcji:', error);
+            });
+    }
+
+    function loadTexts() {
+        const lessonId = document.getElementById('lessonSelect').value;
+        fetch(`/all-texts/${lessonId}`)
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById('textSelect');
+                select.innerHTML = '<option value="">Wybierz tekst...</option>';
+                data.forEach(text => {
+                    select.innerHTML += `<option value="${text.texts_id}">${text.texts_name}</option>`;
+                });
+            });
+        loadSelectedLesson();
+    }
+
+    function loadText() {
+        const textId = document.getElementById('textSelect').value;
+        fetch(`/get-texts/${textId}`)
+            .then(response => response.json())
+            .then(data => {
+                if(data.length > 0){
+                    document.getElementById('textTitle').value = data[0].texts_name;
+                    document.getElementById('textContent').value = data[0].texts_text;
+                }
+            });
+    }
+
+    function addLesson() {
+        const lessonTitle = document.getElementById('lessonTitle').value;
+        fetch('/add-lesson', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ lessonTitle: lessonTitle })
+        })
+            .then(response => response.json())
+            .then(data => {
+                loadLessons();
+            });
+    }
+
+    function editLesson() {
+        const lessonId = document.getElementById('lessonSelect').value;
+        const newTitle = document.getElementById('lessonTitle').value;
+        fetch(`/edit-lesson/${lessonId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ lessonTitle: newTitle })
+        })
+            .then(response => response.json())
+            .then(data => {
+                loadLessons();
+            });
+    }
+
+    function deleteLesson() {
+        const lessonId = document.getElementById('lessonSelect').value;
+        fetch(`/delete-lesson/${lessonId}`, { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                loadLessons();
+            });
+    }
+
+    function addText() {
+        const lessonId = document.getElementById('lessonSelect').value;
+        const textTitle = document.getElementById('textTitle').value;
+        const textContent = document.getElementById('textContent').value;
+        fetch(`/add-text/${lessonId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ TextTitle: textTitle, text: textContent })
+        })
+            .then(response => response.json())
+            .then(data => {
+                loadTexts();
+            });
+    }
+
+    function editText() {
+        const textId = document.getElementById('textSelect').value;
+        const newTextTitle = document.getElementById('textTitle').value;
+        const newText = document.getElementById('textContent').value;
+        fetch(`/edit-text/${textId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ TextTitle: newTextTitle, text: newText })
+        })
+            .then(response => response.json())
+            .then(data => {
+                loadTexts();
+            });
+    }
+
+    function deleteText() {
+        const textId = document.getElementById('textSelect').value;
+        fetch(`/delete-text/${textId}`, { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                loadTexts();
+            });
+    }
+</script>
+</body>
+</html>

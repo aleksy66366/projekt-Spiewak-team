@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <link rel="stylesheet" href="rejestracja.css">
+    <script>
+        function checkUsernameAvailability() {
+            const username = document.getElementById('login').value;
+            fetch(`/test-username/${username}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.available) {
+                        alert('Nazwa użytkownika jest już zajęta.');
+                        return false;
+                    } else {
+                        var password = document.getElementById("password").value;
+                        var checkpassword = document.getElementById("checkpassword").value;
+
+                        console.log(password);
+                        console.log(checkpassword);
+                        if (password !== checkpassword) {
+                            alert("Hasła nie są identyczne. Spróbuj ponownie.");
+                            return false;
+                        }else
+                        {
+                            document.getElementById('register-form').submit();
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            return false;
+        }
+
+    </script>
+</head>
+<body>
+<h1>Rejestracja</h1>
+<form id="register-form" onsubmit="return checkUsernameAvailability()" action="/try-register" method="post">
+    <label for="login">Nazwa użytkownika:</label>
+    <input type="text" id="login" name="login" required><br><br>
+
+    <label for="password">Hasło:</label>
+    <input type="password" id="password" name="password" required><br><br>
+    <label for="checkpassword">Powtórz hasło:</label>
+    <input type="password" id="checkpassword" name="checkpassword" required><br><br>
+    <input  type="submit"  value="Zarejestruj się">
+</form>
+
+</body>
+</html>

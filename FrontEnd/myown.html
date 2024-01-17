@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Own Text</title>
+    <link rel="stylesheet" href="myown.css">
+    <script>
+        // Funkcje JavaScript do obsługi zdarzeń
+        let selectedTextId = null;
+
+        window.onload = function() {
+            fetchTextTitles();
+        };
+
+        function fetchTextTitles() {
+            fetch('http://localhost:3000/get-texts-for-user')
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById('text-title-select');
+                    select.innerHTML = '';
+                    data.forEach(text => {
+                        const option = document.createElement('option');
+                        option.value = text.owntexts_id;
+                        option.textContent = text.owntexts_name;
+                        select.appendChild(option);
+                    });
+                });
+        }
+
+        function selectText() {
+            const select = document.getElementById('text-title-select');
+            selectedTextId = select.value;
+
+            fetch(`http://localhost:3000/get-owntext/${selectedTextId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('text-title').value = select.options[select.selectedIndex].text;
+                    document.getElementById('text-content').value = data[0] && data[0].owntexts_text || '';
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function addText() {
+            const title = document.getElementById('text-title').value;
+            const content = document.getElementById('text-content').value;
+
+            fetch('http://localhost:3000/add-owntext', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ textTitleToAddForOwn: title, textToAddForOwn: content })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    fetchTextTitles(); // Odświeżenie listy tytułów
+                });
+        }
+
+        function editText() {
+            if (!selectedTextId) {
+                alert('Wybierz tekst do edycji!');
+                return;
+            }
+
+            const title = document.getElementById('text-title').value;
+            const content = document.getElementById('text-content').value;
+
+            fetch(`http://localhost:3000/edit-owntext/${selectedTextId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ textTitleToAddForOwn: title, textToAddForOwn: content })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                });
+        }
+
+        function deleteText() {
+            if (!selectedTextId) {
+                alert('Wybierz tekst do usunięcia!');
+                return;
+            }
+
+            fetch(`http://localhost:3000/delete-owntext/${selectedTextId}`, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    fetchTextTitles(); // Odświeżenie listy tytułów
+                });
+        }
+    </script>
+</head>
+<body>
+<select id="text-title-select" onchange="selectText()"></select>
+<br>
+<input type="text" id="text-title" placeholder="Tytuł Tekstu">
+<br>
+<textarea id="text-content" placeholder="Treść Tekstu" style="height: 300px;"></textarea>
+<br>
+<button onclick="addText()">Dodaj</button>
+<button onclick="editText()">Edytuj</button>
+<button onclick="deleteText()">Usuń</button>
+</body>
+</html>

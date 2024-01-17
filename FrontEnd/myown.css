@@ -1,0 +1,49 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 20px;
+}
+
+select, input, textarea, button {
+    margin-bottom: 10px;
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+textarea {
+    resize: none;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+select {
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+#text-title-select {
+    width: 50%;
+}
+
+#text-title,
+#text-content {
+    width: 50%;
+}
+
+@media (max-width: 600px) {
+    #text-title-select,
+    #text-title,
+    #text-content {
+        width: 100%;
+    }
+}

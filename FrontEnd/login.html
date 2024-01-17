@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>Logowanie</h1>
+<form action="/try-login" method="post">
+    <label for="login">Nazwa użytkownika:</label>
+    <input type="text" id="login" name="login" required><br><br>
+
+    <label for="password">Hasło:</label>
+    <input type="password" id="password" name="password" required><br><br>
+
+    <input type="submit" value="Zaloguj się">
+    <div id="error-message" style="color: red;"></div>
+    <h6 id="registerDiv">Rejestracja</h6>
+</form>
+<script>
+
+    var registerDiv = document.getElementById("registerDiv");
+    registerDiv.onclick = function() {
+        window.location.href = '/register';
+    };
+
+    window.onload = function(){
+    const params = new URLSearchParams(window.location.search);
+        const error = params.get('error');
+        if (error) {
+            let message = '';
+            if (error === 'noUser') {
+                message = 'Użytkownik nie istnieje.';
+            } else if (error === 'invalidCredentials') {
+                message = 'Nieprawidłowe dane logowania.';
+            }
+            // Wyświetl komunikat o błędzie
+            document.getElementById('error-message').innerText = message;
+        }
+    };
+
+
+
+    // // Pobranie parametrów adresu URL
+    // const urlParams = new URLSearchParams(window.location.search);
+    // const error = urlParams.get('error');
+    //
+    // // Sprawdzenie czy istnieje parametr error i wyświetlenie alertu
+    // if (error) {
+    //     if (error === 'NoUser') {
+    //         alert("Nie ma takiego użytkownika.");
+    //     }
+    // }
+
+</script>
+</body>
+</html>

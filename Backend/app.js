@@ -14,7 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Ustalenie katalogu, w którym znajdują się pliki HTML i CSS
-const staticDir = path.join(__dirname, '../Frontend/HTML');
+const staticDir = path.join(__dirname, '../FrontEnd');
 app.use(express.static(staticDir));
 
 // Tworzenie połączenia z bazą danych
@@ -51,7 +51,7 @@ app.use((req, res, next) => {
 //                 Strona Główna
 // ----------------------------------------------------
 app.get('/', (req, res) => {
-    const registerPath = path.join(staticDir, '../Frontend/HTML/main.html');
+    const registerPath = path.join(staticDir, '/main.html');
     res.sendFile(registerPath);
 });
 
@@ -124,10 +124,12 @@ app.post('/add-record/:textId/:recordPts', (req, res) => {
 });
 
 // Endpoint do pobierania top 100 graczy
-app.get('/top-records', (req, res) => {
-    const query = "SELECT * FROM records ORDER BY record_pkt ASC LIMIT 100";
+app.get('/top-records/:textId', (req, res) => {
+    const textId = req.params.textId;
 
-    db.all(query, [], (err, rows) => {
+    const query = "SELECT * FROM records WHERE texts_id = ? ORDER BY record_pkt DESC LIMIT 100";
+
+    db.all(query, [textId], (err, rows) => {
         if (err) {
             res.status(500).send({ error: err.message });
             return;
@@ -136,11 +138,29 @@ app.get('/top-records', (req, res) => {
     });
 });
 
+// Endpoint zwracający id usera
+app.get('/get-user-by-id/:userId', (req, res) => {
+    const userId = req.params.userId; // Używaj 'userId', a nie 'lessonId'
+
+    const query = "SELECT users_login FROM users WHERE users_id = ?";
+    db.get(query, [userId], (err, row) => {
+        if (err) {
+            res.status(500).send({ error: err.message });
+            return;
+        }
+        if (row) {
+            res.status(200).json(row);
+        } else {
+            res.status(404).send({ message: "User not found" }); // Zmieniłem komunikat na bardziej precyzyjny
+        }
+    });
+});
+
 // ----------------------------------------------------
 //                 Własny text
 // ----------------------------------------------------
 app.get('/My-Custom-Text', (req, res) => {
-    const registerPath = path.join(staticDir, '../Frontend/HTML/MyCustomText.html');
+    const registerPath = path.join(staticDir, '../Frontend/myown.html');
     res.sendFile(registerPath);
 });
 
@@ -246,7 +266,7 @@ app.post('/edit-owntext/:owntexts_id', (req, res) => {
 
 //tmp                                                                       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 app.get('/Test-My-Custom-Text', (req, res) => {
-    const registerPath = path.join(staticDir, '../../Backend/Tests/test-owntext.html');
+    const registerPath = path.join(staticDir, '../Backend/Tests/test-owntext.html');
     res.sendFile(registerPath);
 });
 
@@ -254,7 +274,7 @@ app.get('/Test-My-Custom-Text', (req, res) => {
 //                 Edycja administratorów             |tylko dla admin
 // ----------------------------------------------------
 app.get('/users', isAdmin,(req, res) => {
-    const registerPath = path.join(staticDir, '../Frontend/HTML/users.html');
+    const registerPath = path.join(staticDir, '../Frontend/users.html');
     res.sendFile(registerPath);
 });
 
@@ -350,7 +370,11 @@ app.post('/try-login', (req, res) => {
                 res.redirect('/');
             });
         } else {
-            res.redirect('/login');
+            if (!user) {
+                res.redirect('/login?error=noUser');
+            } else {
+                res.redirect('/login?error=invalidCredentials');
+            }
         }
     });
 });
@@ -371,7 +395,7 @@ app.get('/logout', (req, res) => {
         //     }
         // });
 
-        res.redirect('/login'); // Przekierowanie na stronę logowania
+        res.redirect('/'); // Przekierowanie na stronę logowania
     }
 });
 
@@ -380,7 +404,7 @@ app.get('/logout', (req, res) => {
 // ----------------------------------------------------
 //tmp                                                                       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 app.get('/Test-register', (req, res) => {
-    const registerPath = path.join(staticDir, '../../Backend/Tests/test-register.html');
+    const registerPath = path.join(staticDir, '../Backend/Tests/test-register.html');
     res.sendFile(registerPath);
 });
 app.get('/register', (req, res) => {
@@ -432,7 +456,7 @@ app.post('/try-register', (req, res) => {
 // ----------------------------------------------------
 //tmp                                                                       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 app.get('/Test-editLessons', isAdmin, (req, res) => {
-    const registerPath = path.join(staticDir, '../../Backend/Tests/test-editlessons.html');
+    const registerPath = path.join(staticDir, '../Backend/Tests/test-editlessons.html');
     res.sendFile(registerPath);
 });
 app.get('/editLessons', isAdmin, (req, res) => {

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista Użytkowników</title>
+    <link rel="stylesheet" href="users.css">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/non-admin-users')
+                .then(response => response.json())
+                .then(data => {
+                    const list = document.getElementById('users-list');
+                    data.forEach(user => {
+                        const li = document.createElement('li');
+                        li.textContent = user.users_login;
+
+                        const promoteButton = document.createElement('button');
+                        promoteButton.textContent = 'Awans';
+                        promoteButton.onclick = function() { promoteToAdmin(user.users_id); };
+
+                        li.appendChild(promoteButton);
+                        list.appendChild(li);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        function promoteToAdmin(userId) {
+            fetch(`/add-admin/${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    window.location.reload(); // Odświeżenie strony po zmianie
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+</head>
+<body>
+<h1>Lista Użytkowników Niebędących Administratorami</h1>
+<ul id="users-list"></ul>
+</body>
+</html>

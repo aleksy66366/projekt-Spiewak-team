@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>MAIN</title>
+    <link rel="stylesheet" href="main.css">
+    <script src="logoutNotification.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+<header>
+    <nav class="top-left-menu">
+        <ul>
+            <li><a href="">Home</a></li>
+            <li class="dropdown" id="dodajtekst">Dodaj tekst
+                <!-- <ul class="dropdown-content">
+                    <li><a href="#">Lekcja 1</a></li>
+                    <li><a href="#">Lekcja 2</a></li>
+                    Add more subcategories as needed
+                </ul> -->
+            </li>
+            <li id="zatrudniaj">Zatrudniaj</li>
+<!--            <li class="dropdown">
+                <a href="#">Dostępne języki</a>
+                <ul class="dropdown-content">
+                    <li><a href="#">Polski</a></li>
+                    <li><a href="#">English</a></li>
+                    <li><a href="#">Śląski</a></li>
+                    <li><a href="#">Kaszubski</a></li>
+                    <li><a href="#">Góralski</a></li>
+                    <li><a href="#">Piracki</a></li>
+
+                </ul>
+
+            </li>-->
+            <li id="edytujtekst">Edytuj tekst</li>
+        </ul>
+    </nav>
+    <div class="top-right-menu">
+        <!-- <input id="Wyloguj" type="submit" value="Wyloguj się"> -->
+        <button id="authButton">Zaloguj</button>
+    </div>
+</header>
+
+<div id="recordsDisplay"></div>
+<link rel="stylesheet" href="divy.css">
+<div id="Lekcje">
+    <h2>Lekcje</h2>
+    <select id="lessonSelect" onchange="loadTexts()">
+        <!-- Opcje lekcji będą załadowane tutaj -->
+    </select>
+    <input type="text" id="lessonTitle" placeholder="Tytuł lekcji">
+
+</div>
+
+<div id="Teksty">
+    <h2>Teksty</h2>
+    <select id="textSelect" onchange="loadText()">
+        <!-- Opcje tekstów będą załadowane tutaj -->
+    </select>
+    <input type="text" id="textTitle" placeholder="Tytuł tekstu">
+    <textarea id="textContent" placeholder="Tekst" readonly></textarea>
+    <h1>Checker</h1>
+    <div id="erory"><div id="displayErrors" class="errorDisplay"></div></div>
+    <h1>PISZ TUTAJ</h1>
+    <textarea id="pisztutaj" placeholder="pisz"></textarea>
+
+    <div id="typingSpeedDisplay">Speed: none cps</div>
+
+    <input type="button" id="clearText" value="Wyczyść">
+
+
+</div>
+<div id="bodykeyboard"><div id="keyboard" class="keyboard"></div></div>
+
+
+<script>
+
+    var dodajtekst = document.getElementById('dodajtekst');
+    dodajtekst.onclick = function () {
+        window.location.href = '/My-Custom-Text';
+    };
+    var zatrudniaj = document.getElementById('zatrudniaj');
+    zatrudniaj.onclick = function () {
+        window.location.href = '/users';
+    };
+    var edytujtekst = document.getElementById('edytujtekst');
+    edytujtekst.onclick = function () {
+        window.location.href = '/editLessons';
+    };
+
+    const layout = [
+        ["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "="],
+        ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\"],
+        ["A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'",'SHIFT'],
+        ["Z", "X", "C", "V",  "B","N", "M", ",", ".", "/",'CONTROL','CAPSLOCK'],
+        [" "],
+
+
+    ];
+
+    const activeKeys = new Set();
+
+    function handleKeyPress(event, key) {
+        if (event.type === 'keydown') {
+            activeKeys.add(key);
+        } else if (event.type === 'keyup') {
+            activeKeys.delete(key);
+        }
+
+        updateKeyStyles();
+    }
+
+    function updateKeyStyles() {
+        const keys = document.querySelectorAll('.key');
+        keys.forEach(key => {
+            const keyContent = key.textContent;
+
+            // Sprawdź, czy klawisz jest wciśnięty
+            const isActive = activeKeys.has(keyContent) || (keyContent === 'ShiftLeft' && activeKeys.has('Shift')) || (keyContent === 'CtrlLeft' && activeKeys.has('Control'));
+
+            key.classList.toggle('active', isActive);
+        });
+    }
+
+    const keyboardElement = document.getElementById('keyboard');
+    layout.forEach(row => {
+        row.forEach(letter => {
+            const keyElement = document.createElement('div');
+            keyElement.classList.add('key');
+            keyElement.textContent = letter;
+            keyElement.addEventListener('mousedown', (event) => handleKeyPress(event, letter));
+            keyElement.addEventListener('mouseup', (event) => handleKeyPress(event, letter));
+            keyboardElement.appendChild(keyElement);
+        });
+    });
+
+    window.addEventListener('keydown', (event) => handleKeyPress(event, event.key.toUpperCase()));
+    window.addEventListener('keyup', (event) => handleKeyPress(event, event.key.toUpperCase()));
+
+
+    function fetchTopRecords(textId) {
+        fetch(`/top-records/${textId}`)
+            .then(response => response.json())
+            .then(records => {
+                console.log(records.map);
+                const recordsDisplay = document.getElementById('recordsDisplay');
+                recordsDisplay.innerHTML = '<ol>' + records.map(record => `<li> ${record.record_pkt} pkt</li>`).join('') + '</ol>';
+            })
+            .catch(error => console.error('Error:', error));
+    }
+    window.onload = loadLessons;
+
+    function loadLessons() {
+        fetch('/all-lessons')
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById('lessonSelect');
+                select.innerHTML = '<option value="">Wybierz lekcję...</option>';
+                data.forEach(lesson => {
+                    select.innerHTML += `<option value="${lesson.lessons_id}">${lesson.lesson_name}</option>`;
+                });
+            });
+
+    }
+
+    function loadSelectedLesson() {
+        const lessonId = document.getElementById('lessonSelect').value;
+        if (!lessonId) return;
+
+        fetch(`/get-lesson/${lessonId}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('lessonTitle').value = data.lesson_name;
+                // Możesz tutaj załadować więcej danych o lekcji, jeśli są dostępne
+            })
+            .catch(error => {
+                console.error('Błąd podczas ładowania lekcji:', error);
+            });
+    }
+
+    function loadTexts() {
+        const lessonId = document.getElementById('lessonSelect').value;
+        fetch(`/all-texts/${lessonId}`)
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById('textSelect');
+                select.innerHTML = '<option value="">Wybierz tekst...</option>';
+                data.forEach(text => {
+                    select.innerHTML += `<option value="${text.texts_id}">${text.texts_name}</option>`;
+                });
+            });
+        loadSelectedLesson();
+    }
+
+    function loadText() {
+        const textId = document.getElementById('textSelect').value;
+        console.log(textId);
+        fetchTopRecords(textId);
+        fetch(`/get-texts/${textId}`)
+            .then(response => response.json())
+            .then(data => {
+                if(data.length > 0){
+                    document.getElementById('textTitle').value = data[0].texts_name;
+                    document.getElementById('textContent').value = data[0].texts_text;
+                }
+            });
+    }
+    // var Wyloguj = document.getElementById("Wyloguj");
+    // Wyloguj.onclick = function () {
+    //     showLogoutNotification();
+    //     window.location.href = '/logout';
+    // };
+    document.addEventListener('DOMContentLoaded', function() {
+    // Sprawdzenie statusu użytkownika po załadowaniu strony
+    fetch('/user-status')
+        .then(response => response.json())
+        .then(data => {
+            const button = document.getElementById("authButton");
+            
+            if (data.isLoggedIn) {
+                // Użytkownik zalogowany
+                button.textContent = 'Wyloguj';
+                button.onclick = function() {
+                    showLogoutNotification();
+                    window.location.href = '/logout';
+                };
+                dodajtekst.style.display = 'inline';
+                if(data.isAdmin){
+                    edytujtekst.style.display = 'inline';
+                    zatrudniaj.style.display = 'inline';
+
+                }else{
+                    edytujtekst.style.display = 'none';
+                    zatrudniaj.style.display = 'none';
+                }
+            } else {
+                // Użytkownik niezalogowany
+                button.textContent = 'Zaloguj';
+                button.onclick = function() {
+                    window.location.href = '/login';
+                };
+                edytujtekst.style.display = 'none';
+                zatrudniaj.style.display = 'none';
+                dodajtekst.style.display = 'none';
+
+            }
+        })
+        .catch(error => {
+            console.error('Błąd podczas sprawdzania statusu użytkownika:', error);
+        });
+});
+    // Ładowanie lekcji przy otwieraniu strony
+    // Dodanie obsługi zdarzeń dla pola textarea
+
+
+
+    var pisztutajInput = document.getElementById("pisztutaj");
+    var errorFlag = false; // Existing error flag
+
+    pisztutajInput.addEventListener('input', checkInput);
+
+    function checkInput() {
+        var originalText = document.getElementById('textContent').value;
+        var enteredText = pisztutajInput.value;
+        var displayText = ''; // Initialize display text
+        var isCorrect = true; // Flag to track if the text is correct
+
+        for (var i = 0; i < enteredText.length; i++) {
+            if (originalText[i] !== enteredText[i]) {
+                // Highlight incorrect letter
+                displayText += '<span style="color: red;font-weight: bold;">' + enteredText[i] + '</span>';
+                isCorrect = false;
+            } else {
+                // Correct letter remains unchanged
+                displayText += enteredText[i];
+            }
+        }
+
+        // Update the display element with the comparison
+        document.getElementById('displayErrors').innerHTML = displayText;
+
+        // Check if the text is correct and the length matches
+        if (isCorrect && enteredText.length === originalText.length) {
+            document.getElementById('displayErrors').style.color = 'green';
+
+            //alek new
+            const textId = document.getElementById('textSelect').value;
+            const recordPtsText = document.getElementById('typingSpeedDisplay').textContent;
+            const recordPts = parseInt(recordPtsText);
+
+            addRecord(textId, recordPts);
+
+            pisztutajInput.setAttribute('readonly', true); // Prevent further typing
+        }
+    }
+
+    var clearTextButton = document.getElementById("clearText");
+    clearTextButton.addEventListener('click', clearTextInput);
+
+    function clearTextInput() {
+        var pisztutajInput = document.getElementById("pisztutaj");
+
+        // Clear the input field
+        pisztutajInput.value = '';
+
+        // Remove the readonly attribute to make it editable
+        pisztutajInput.removeAttribute('readonly');
+
+        // Reset the displayErrors element
+        document.getElementById('displayErrors').innerHTML = '';
+        document.getElementById('displayErrors').style.color = 'initial';
+
+        startTime = null;
+        letterCount = 0;
+        document.getElementById('typingSpeedDisplay').textContent = '';
+    }
+    var pisztutajInput = document.getElementById("pisztutaj");
+    pisztutajInput.addEventListener('keydown', function(event) {
+        // Check if the event is a keydown event
+        if (event.type === 'keydown') {
+            // Call the handleKeyPress function with the pressed key
+            handleKeyPress(event.key);
+        }
+    });
+
+    var startTime;  // Tracks the start time of typing
+    var letterCount = 0;  // Counts the number of letters typed
+
+    // Function to start the timer and letter count
+    function startTyping() {
+        if (!startTime) {
+            startTime = new Date();
+        }
+        letterCount++;
+        updateTypingSpeed();
+    }
+
+    // Function to calculate and update typing speed
+    function updateTypingSpeed() {
+        var currentTime = new Date();
+        var timeDiff = (currentTime - startTime) / 1000; // Time difference in minutes
+        var speed = Math.round(letterCount / timeDiff);  // Letters per minute
+        document.getElementById('typingSpeedDisplay').textContent = speed;
+    }
+
+    // Attach the startTyping function to the 'input' event of your text area
+    pisztutajInput.addEventListener('input', startTyping);
+
+    function addRecord(textId, recordPts) {
+        // Assuming `fetch` is available in your environment
+        fetch(`/add-record/${textId}/${recordPts}`, {
+            method: 'POST',
+            // Include session cookies, if your session management relies on them
+            credentials: 'include'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data.message);
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+    }
+
+</script>
+
+
+</body>
+
+</html>
