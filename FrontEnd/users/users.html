@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Lista Użytkowników</title>
+    <link rel="stylesheet" href="/users/users.css">
+</head>
+
+<body>
+<header>
+    <nav class="top-left-menu">
+        <ul>
+            <li id="home-link">Home</li>
+            <li class="dropdown" id="dodajtekst">Dodaj tekst</li>
+            <li id="edytujtekst">Edytuj tekst</li>
+            <li id="wlasny">Wlasny tekst</li>
+        </ul>
+        <h1>Lista Użytkowników Niebędących Administratorami</h1>
+        <ul id="users-list"></ul>
+    </nav>
+</header>
+<audio id="backgroundAudio" autoplay loop>
+    <source src="/FrontEnd/muzyczka.mp3" type="audio/mp3">
+</audio>
+<script defer>
+    document.addEventListener('DOMContentLoaded', function ()
+    {
+        fetch('/non-admin-users')
+            .then(response => response.json())
+            .then(data => {
+                const list = document.getElementById('users-list');
+                data.forEach(user => {
+                    const li = document.createElement('li');
+                    li.textContent = user.users_login;
+
+                    const promoteButton = document.createElement('button');
+                    promoteButton.textContent = 'Awans';
+                    promoteButton.onclick = function () {
+                        promoteToAdmin(user.users_id);
+                    };
+
+                    li.appendChild(promoteButton);
+                    list.appendChild(li);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+
+        var edytujtekst = document.getElementById('edytujtekst');
+        edytujtekst.onclick = function () {
+            window.location.href = '/editLessons';
+        };
+
+        var homeLink = document.getElementById('home-link');
+        homeLink.onclick = function () {
+            window.location.href = '/'; // Replace with your main page URL
+        };
+
+        var dodajtekst = document.getElementById('dodajtekst');
+        dodajtekst.onclick = function () {
+            window.location.href = '/My-Custom-Text';
+        };
+        var wlasny = document.getElementById('wlasny');
+        wlasny.onclick = function () {
+            window.location.href = '/custom';
+        };
+    });
+
+    function promoteToAdmin(userId) {
+        var audio = new Audio('./FrontEnd/muzyczka.mp3');
+        audio.play().catch(e => {
+            console.log("Automatyczne odtwarzanie dźwięku zostało zablokowane przez przeglądarkę");
+        });
+        setTimeout(function() {
+            fetch(`/add-admin/${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    window.location.reload(); // Odświeżenie strony po zmianie
+                })
+                .catch(error => console.error('Error:', error));
+        }, 1000); // Opóźnienie 1000 ms (1 sekunda)
+
+    }
+</script>
+</body>
+
+</html>

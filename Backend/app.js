@@ -41,9 +41,9 @@ function isAdmin(req, res, next) {
 }
 
 //tmp                                                                       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-app.use((req, res, next) => {
-    req.session.userId = 1;
-    next();
+ app.use((req, res, next) => {
+     req.session.userId = req.session.loggedUserId;
+     next();
 });
 
 
@@ -51,7 +51,7 @@ app.use((req, res, next) => {
 //                 Strona Główna
 // ----------------------------------------------------
 app.get('/', (req, res) => {
-    const registerPath = path.join(staticDir, '/main.html');
+    const registerPath = path.join(staticDir, '/main/main.html');
     res.sendFile(registerPath);
 });
 
@@ -87,7 +87,7 @@ app.get('/get-texts-for-lesson/:lessonId', (req, res) => {
 app.get('/get-text/:textId', (req, res) => {
     const textId = req.params.textId;
 
-    const query = "SELECT texts_text FROM texts WHERE texts_id = ?";
+    const query = "SELECT texts_name, texts_text FROM texts WHERE texts_id = ?";
 
     db.all(query, [textId], (err, rows) => {
         if (err) {
@@ -103,7 +103,10 @@ app.post('/add-record/:textId/:recordPts', (req, res) => {
     // Pobranie danych z żądania
     const textId = req.params.textId;
     const recordPts = req.params.recordPts;
-    const userId = req.session.userId; 
+    // const userId = req.params.recordPts;
+    const userId = req.session.userId;
+    console.log(`userId: ${userId}`);
+    console.log(`serwers userId${req.session.loggedUserId}`);
 
     // Sprawdzenie, czy wszystkie wymagane dane są dostępne
     if (!textId || !recordPts || !userId) {
@@ -120,6 +123,7 @@ app.post('/add-record/:textId/:recordPts', (req, res) => {
             return;
         }
         res.status(200).send({ message: "Rekord dodany pomyślnie" });
+
     });
 });
 
@@ -127,7 +131,7 @@ app.post('/add-record/:textId/:recordPts', (req, res) => {
 app.get('/top-records/:textId', (req, res) => {
     const textId = req.params.textId;
 
-    const query = "SELECT * FROM records WHERE texts_id = ? ORDER BY record_pkt DESC LIMIT 100";
+    const query = "SELECT * FROM records LEFT JOIN users  ON users.users_id=records.users_id WHERE texts_id = ? ORDER BY record_pkt DESC LIMIT 10";
 
     db.all(query, [textId], (err, rows) => {
         if (err) {
@@ -137,6 +141,20 @@ app.get('/top-records/:textId', (req, res) => {
         res.status(200).json(rows);
     });
 });
+// // Endpoint do pobierania top 100 graczy
+// app.get('/top-records/:textId', (req, res) => {
+//     const textId = req.params.textId;
+//
+//     const query = "SELECT * FROM records WHERE texts_id = ? ORDER BY record_pkt DESC LIMIT 100";
+//
+//     db.all(query, [textId], (err, rows) => {
+//         if (err) {
+//             res.status(500).send({ error: err.message });
+//             return;
+//         }
+//         res.status(200).json(rows);
+//     });
+// });
 
 // Endpoint zwracający id usera
 app.get('/get-user-by-id/:userId', (req, res) => {
@@ -160,8 +178,18 @@ app.get('/get-user-by-id/:userId', (req, res) => {
 //                 Własny text
 // ----------------------------------------------------
 app.get('/My-Custom-Text', (req, res) => {
-    const registerPath = path.join(staticDir, '../Frontend/myown.html');
+    const registerPath = path.join(staticDir, '../Frontend/myown/myown.html');
     res.sendFile(registerPath);
+});
+
+app.get('/custom', (req, res) => {
+    let registerPath;
+    if(req.session.isLoggedIn) {
+        registerPath = path.join(staticDir, '../Frontend/wlasne/wlasne.html');
+        res.sendFile(registerPath);
+    }
+    else res.redirect('/');
+
 });
 
 // Endpoint do pobierania tekstów usera
@@ -274,7 +302,7 @@ app.get('/Test-My-Custom-Text', (req, res) => {
 //                 Edycja administratorów             |tylko dla admin
 // ----------------------------------------------------
 app.get('/users', isAdmin,(req, res) => {
-    const registerPath = path.join(staticDir, '../Frontend/users.html');
+    const registerPath = path.join(staticDir, '../Frontend/users/users.html');
     res.sendFile(registerPath);
 });
 
@@ -325,7 +353,7 @@ app.get('/Test-login', (req, res) => {
     res.sendFile(registerPath);
 });
 app.get('/login', (req, res) => {
-    const loginPath = path.join(staticDir, 'login.html');
+    const loginPath = path.join(staticDir, '/login/login.html');
     res.sendFile(loginPath);
 });
 
@@ -408,7 +436,7 @@ app.get('/Test-register', (req, res) => {
     res.sendFile(registerPath);
 });
 app.get('/register', (req, res) => {
-    const loginPath = path.join(staticDir, 'register.html');
+    const loginPath = path.join(staticDir, '/register/register.html');
     res.sendFile(loginPath);
 });
 
@@ -460,7 +488,7 @@ app.get('/Test-editLessons', isAdmin, (req, res) => {
     res.sendFile(registerPath);
 });
 app.get('/editLessons', isAdmin, (req, res) => {
-    const loginPath = path.join(staticDir, 'editlessons.html');
+    const loginPath = path.join(staticDir, '/editlessons/editlessons.html');
     res.sendFile(loginPath);
 });
 

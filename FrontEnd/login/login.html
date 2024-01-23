@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Test Login</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/login/style.css">
 </head>
 <body>
 <h1>Logowanie</h1>
@@ -16,13 +16,18 @@
 
     <input type="submit" value="Zaloguj się">
     <div id="error-message" style="color: red;"></div>
-    <h6 id="registerDiv">Rejestracja</h6>
+    <h6 id="registerDiv" >Rejestracja</h6>
+    <h6 id="guestDiv">Gość</h6>
 </form>
 <script>
 
     var registerDiv = document.getElementById("registerDiv");
     registerDiv.onclick = function() {
         window.location.href = '/register';
+    };
+    var guestDiv = document.getElementById("guestDiv");
+    guestDiv.onclick = function() {
+        window.location.href = '/';
     };
 
     window.onload = function(){

@@ -1,0 +1,60 @@
+body {
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-image:url("admintlo.jpg");
+    background-size: cover;
+
+}
+#backgroundAudio {
+    display: none; /* Ukryj element audio */
+}
+.top-left-menu
+{
+    margin-top:1.5%;
+    border: 5px solid red;
+    background-color: #2c2b2b;
+    border-radius: 10px;
+
+}
+h1 {
+    text-align: center;
+    color: white;
+    margin:5px 50px 20px 50px;
+}
+
+ul {
+    list-style: none;
+    padding: 30px;
+}
+
+li {
+
+    background-color: #9a9a9a;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgb(154, 154, 154);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+button {
+    background-color: #e20000;
+    color: #ffffff;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #9a9a9a;
+}

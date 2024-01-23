@@ -1,7 +1,7 @@
 body {
     margin: 0;
     padding: 0;
-    background-image: url('background.jpg');
+    background-image: url('../images/background.jpg');
     font-family: 'Helvetica', 'Arial', sans-serif;
     max-height: 100vw;
 }
@@ -35,6 +35,7 @@ header {
 
 .top-left-menu a:hover {
     color: #ffcc00; /* You can change the highlight color on hover */
+    cursor: pointer;
 }
 
 .dropdown {
@@ -91,6 +92,9 @@ header {
     cursor: pointer;
     font-weight: bold;
 }
+
+
+
 #authButton{
     background-color: #333; /* You can change the background color */
     color: white; /* You can change the text color */
@@ -99,6 +103,12 @@ header {
     padding: 5px 10px;
     cursor: pointer;
     font-weight: bold;
+    transition: color 0.3s; /* Add smooth transition for color change */
+
+}
+
+#authButton:hover {
+    color: #ffcc00; /* You can change the highlight color on hover */
 }
 
 #Wyloguj:hover {
@@ -133,11 +143,12 @@ header {
 #Lekcje {
     border: 1px solid #ccc;
     border-radius: 8px;
-    padding: 2.5px;
+    /*padding: 2.5px;*/
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     margin-bottom: 5px;
     width: 50%;
     margin: 0 auto;
+    text-align: center;
 
 }
 
@@ -147,7 +158,7 @@ header {
 
 #lessonSelect,
 #lessonTitle {
-    width: 100%;
+    width: 50%;
     padding: 2.5px;
     box-sizing: border-box;
     margin-bottom: 2.5px;
@@ -157,7 +168,7 @@ header {
 #Teksty {
     border: 1px solid #ccc;
     border-radius: 8px;
-    padding: 2.5px;
+    /*padding: 2.5px;*/
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     margin-bottom: 2.5px;
     width: 50%;
@@ -172,8 +183,7 @@ header {
 
 #textSelect,
 #textTitle {
-    width: 100%;
-    padding: 4px;
+    /*padding: 4px;*/
     box-sizing: border-box;
     margin-bottom: 5px;
     width: 50%;
@@ -188,7 +198,7 @@ select {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    padding: 2.5px;
+    /*padding: 2.5px;*/
     border: 1px solid #ccc;
     border-radius: 4px;
     background: #fff;
@@ -197,18 +207,24 @@ select {
 
 textarea{
     resize: none;
-    width: 100%;
+    width: 80%;
     height: auto;
 
 }
 
 #erory {
-    width: 100%;
-    height: 50px;
+    max-width: 100%;
+    max-height: 1000px; /* Maksymalna wysokość (możesz dostosować do swoich potrzeb) */
+    min-height: 30px;
+    height: auto; /* Automatyczna wysokość, aby dostosować się do ilości tekstu */
     border: 1px solid #000000;
     border-radius: 4px;
     background-color: white;
+    overflow-wrap: break-word;  / Zawija długie słowa na nowej linii /
+    word-break: break-all;  / Łamie słowa w dowolnym miejscu, tworząc bardziej równe linie */
+    padding: 10px; /* Dodaj wewnętrzny odstęp dla celów wizualnych */
 }
+
 
 #bodykeyboard {
     border: 1px solid #ccc;
@@ -281,4 +297,79 @@ textarea{
 #typingSpeedDisplay {
     font-weight: bold;
     padding: 5px;
+}
+
+#zatrudniaj {
+    text-decoration: none;
+    color: white; /* You can change the text color */
+    transition: color 0.3s; /* Add smooth transition for color change */
+    cursor:pointer
+}
+
+#zatrudniaj:hover {
+    color: #ffcc00; /* You can change the highlight color on hover */
+}
+
+#dodajtekst {
+    text-decoration: none;
+    color: white; /* You can change the text color */
+    transition: color 0.3s; /* Add smooth transition for color change */
+    cursor:pointer
+}
+
+#dodajtekst:hover {
+    color: #ffcc00; /* You can change the highlight color on hover */
+}
+
+#edytujtekst {
+    text-decoration: none;
+    color: white; /* You can change the text color */
+    transition: color 0.3s; /* Add smooth transition for color change */
+    cursor:pointer
+}
+
+#edytujtekst:hover {
+    color: #ffcc00; /* You can change the highlight color on hover */
+}
+#recordbox {
+    text-align: left;
+    background-color: #f5f5f5; /* Inne tło w podobnej tematyce */
+    border: 2px solid #ccc; /* Obramowanie */
+    border-radius: 5px;
+    padding: 10px;
+    width: 200px;
+    position: absolute;
+    top: 45%;
+    left: 10px;
+    transform: translateY(-50%);
+    font-size: 14px; /* Zmniejszenie czcionki */
+    font-family: 'Helvetica Neue', Arial, sans-serif; /* Wyróżniająca czcionka */
+}
+
+#recordsList {
+    list-style-type: none;
+    padding: 0;
+}
+
+#recordsList li {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#recordsList li:hover {
+    background-color: #d3f0d3;
+    font-weight:bold;
+}
+
+
+#rekordowatabela
+{
+    text-align: center; /* Wyśrodkowanie tekstu */
+    background-color: #333; /* Kolor tła */
+    color: #fff; /* Kolor tekstu */
+    padding: 10px; /* Wewnętrzny odstęp */
+    font-size: 18px; /* Rozmiar czcionki */
+    font-weight: bold; /* Pogrubienie tekstu */
+
 }

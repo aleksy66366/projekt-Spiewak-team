@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <title>MAIN</title>
-    <link rel="stylesheet" href="main.css">
-    <script src="logoutNotification.js" defer></script>
+    <link rel="stylesheet" href="/main/main.css">
+    <script src="/main/logoutNotification.js" defer></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
@@ -13,29 +13,11 @@
 <header>
     <nav class="top-left-menu">
         <ul>
-            <li><a href="">Home</a></li>
-            <li class="dropdown" id="dodajtekst">Dodaj tekst
-                <!-- <ul class="dropdown-content">
-                    <li><a href="#">Lekcja 1</a></li>
-                    <li><a href="#">Lekcja 2</a></li>
-                    Add more subcategories as needed
-                </ul> -->
-            </li>
+            <li id="home-link">Home</li>
+            <li class="dropdown" id="dodajtekst">Dodaj tekst</li>
             <li id="zatrudniaj">Zatrudniaj</li>
-<!--            <li class="dropdown">
-                <a href="#">Dostępne języki</a>
-                <ul class="dropdown-content">
-                    <li><a href="#">Polski</a></li>
-                    <li><a href="#">English</a></li>
-                    <li><a href="#">Śląski</a></li>
-                    <li><a href="#">Kaszubski</a></li>
-                    <li><a href="#">Góralski</a></li>
-                    <li><a href="#">Piracki</a></li>
-
-                </ul>
-
-            </li>-->
             <li id="edytujtekst">Edytuj tekst</li>
+            <li id="wlasny">Wlasny tekst</li>
         </ul>
     </nav>
     <div class="top-right-menu">
@@ -47,7 +29,7 @@
 <div id="recordsDisplay"></div>
 <link rel="stylesheet" href="divy.css">
 <div id="Lekcje">
-    <h2>Lekcje</h2>
+    <h1>Lekcje</h1>
     <select id="lessonSelect" onchange="loadTexts()">
         <!-- Opcje lekcji będą załadowane tutaj -->
     </select>
@@ -56,7 +38,7 @@
 </div>
 
 <div id="Teksty">
-    <h2>Teksty</h2>
+    <h1>Teksty</h1>
     <select id="textSelect" onchange="loadText()">
         <!-- Opcje tekstów będą załadowane tutaj -->
     </select>
@@ -64,12 +46,12 @@
     <textarea id="textContent" placeholder="Tekst" readonly></textarea>
     <h1>Checker</h1>
     <div id="erory"><div id="displayErrors" class="errorDisplay"></div></div>
-    <h1>PISZ TUTAJ</h1>
-    <textarea id="pisztutaj" placeholder="pisz"></textarea>
+    <h1>Pisz tutaj</h1>
+    <textarea id="pisztutaj" placeholder="Pisz"></textarea>
 
     <div id="typingSpeedDisplay">Speed: none cps</div>
 
-    <input type="button" id="clearText" value="Wyczyść">
+    <input type="button" id="clearText" value="Sprawdź">
 
 
 </div>
@@ -84,11 +66,25 @@
     };
     var zatrudniaj = document.getElementById('zatrudniaj');
     zatrudniaj.onclick = function () {
-        window.location.href = '/users';
+        var audio = new Audio('./FrontEnd/muzyczka.mp3');
+        audio.play().catch(e => {
+            console.log("Automatyczne odtwarzanie dźwięku zostało zablokowane przez przeglądarkę");
+        });
+        setTimeout(function() {
+            window.location.href = '/users';
+        }, 1000); // Opóźnienie 1000 ms (1 sekunda)
     };
     var edytujtekst = document.getElementById('edytujtekst');
     edytujtekst.onclick = function () {
         window.location.href = '/editLessons';
+    };
+    var homeLink = document.getElementById('home-link');
+    homeLink.onclick = function () {
+        window.location.href = '/'; // Replace with your main page URL
+    };
+    var wlasny = document.getElementById('wlasny');
+    wlasny.onclick = function () {
+        window.location.href = '/custom';
     };
 
     const layout = [
@@ -140,21 +136,22 @@
     window.addEventListener('keydown', (event) => handleKeyPress(event, event.key.toUpperCase()));
     window.addEventListener('keyup', (event) => handleKeyPress(event, event.key.toUpperCase()));
 
-
+///////////////////////Tabela Wynikow///////////////////////////////////
     function fetchTopRecords(textId) {
         fetch(`/top-records/${textId}`)
             .then(response => response.json())
             .then(records => {
                 console.log(records.map);
                 const recordsDisplay = document.getElementById('recordsDisplay');
-                recordsDisplay.innerHTML = '<ol>' + records.map(record => `<li> ${record.record_pkt} pkt</li>`).join('') + '</ol>';
+                recordsDisplay.innerHTML = '<div id="recordbox"><h1 id="rekordowatabela">Tabela Rekordów TOP10</h1><ol id="recordsList">' + records.map(record => `<li> ${record.record_pkt} pkt  ${record.users_login} </li>`).join('') + '</ol></div>';
             })
             .catch(error => console.error('Error:', error));
     }
+//////////////////////////////////////////////////////////////////////////
     window.onload = loadLessons;
 
     function loadLessons() {
-        fetch('/all-lessons')
+        fetch('/get-lessons')
             .then(response => response.json())
             .then(data => {
                 const select = document.getElementById('lessonSelect');
@@ -183,7 +180,7 @@
 
     function loadTexts() {
         const lessonId = document.getElementById('lessonSelect').value;
-        fetch(`/all-texts/${lessonId}`)
+        fetch(`/get-texts-for-lesson/${lessonId}`)
             .then(response => response.json())
             .then(data => {
                 const select = document.getElementById('textSelect');
@@ -199,7 +196,7 @@
         const textId = document.getElementById('textSelect').value;
         console.log(textId);
         fetchTopRecords(textId);
-        fetch(`/get-texts/${textId}`)
+        fetch(`/get-text/${textId}`)
             .then(response => response.json())
             .then(data => {
                 if(data.length > 0){
@@ -214,44 +211,47 @@
     //     window.location.href = '/logout';
     // };
     document.addEventListener('DOMContentLoaded', function() {
-    // Sprawdzenie statusu użytkownika po załadowaniu strony
-    fetch('/user-status')
-        .then(response => response.json())
-        .then(data => {
-            const button = document.getElementById("authButton");
-            
-            if (data.isLoggedIn) {
-                // Użytkownik zalogowany
-                button.textContent = 'Wyloguj';
-                button.onclick = function() {
-                    showLogoutNotification();
-                    window.location.href = '/logout';
-                };
-                dodajtekst.style.display = 'inline';
-                if(data.isAdmin){
-                    edytujtekst.style.display = 'inline';
-                    zatrudniaj.style.display = 'inline';
+        // Sprawdzenie statusu użytkownika po załadowaniu strony
+        fetch('/user-status')
+            .then(response => response.json())
+            .then(data => {
+                const button = document.getElementById("authButton");
 
-                }else{
+                if (data.isLoggedIn) {
+                    // Użytkownik zalogowany
+                    button.textContent = 'Wyloguj';
+                    button.onclick = function() {
+
+                        window.location.href = '/logout';
+                    };
+                    dodajtekst.style.display = 'inline';
+                    wlasny.style.display = 'inline';
+                    if(data.isAdmin){
+                        edytujtekst.style.display = 'inline';
+                        zatrudniaj.style.display = 'inline';
+
+                    }else{
+                        edytujtekst.style.display = 'none';
+                        zatrudniaj.style.display = 'none';
+                    }
+                } else {
+                    // Użytkownik niezalogowany
+                    button.textContent = 'Zaloguj';
+                    button.onclick = function() {
+                        window.location.href = '/login';
+                    };
                     edytujtekst.style.display = 'none';
                     zatrudniaj.style.display = 'none';
-                }
-            } else {
-                // Użytkownik niezalogowany
-                button.textContent = 'Zaloguj';
-                button.onclick = function() {
-                    window.location.href = '/login';
-                };
-                edytujtekst.style.display = 'none';
-                zatrudniaj.style.display = 'none';
-                dodajtekst.style.display = 'none';
+                    dodajtekst.style.display = 'none';
+                    wlasny.style.display = 'none';
 
-            }
-        })
-        .catch(error => {
-            console.error('Błąd podczas sprawdzania statusu użytkownika:', error);
-        });
-});
+
+                }
+            })
+            .catch(error => {
+                console.error('Błąd podczas sprawdzania statusu użytkownika:', error);
+            });
+    });
     // Ładowanie lekcji przy otwieraniu strony
     // Dodanie obsługi zdarzeń dla pola textarea
 
@@ -290,7 +290,7 @@
             const textId = document.getElementById('textSelect').value;
             const recordPtsText = document.getElementById('typingSpeedDisplay').textContent;
             const recordPts = parseInt(recordPtsText);
-
+            //const userID = req.session.userId;
             addRecord(textId, recordPts);
 
             pisztutajInput.setAttribute('readonly', true); // Prevent further typing
@@ -376,3 +376,5 @@
 </body>
 
 </html>
+
+

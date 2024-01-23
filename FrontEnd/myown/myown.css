@@ -1,0 +1,184 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-image: url('../images/background.jpg');
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+}
+#Teksty {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    /*padding: 2.5px;*/
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2.5px;
+    width: 50%;
+    margin: 0 auto;
+    text-align: center;
+    margin-top:10%;
+    padding:3%;
+}
+p
+{
+    font-weight: bold;
+    font-size: 14px;
+}
+#text-title-select,
+#textTitle,#text-title {
+    padding: 8px;
+    box-sizing: border-box;
+    margin-bottom: 5px;
+    width: 50%;
+    margin: 0 auto;
+    text-align: center;
+    font-weight: bold;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Styling for textarea */
+
+
+/* Optional styling for select, adjust as needed */
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    /*padding: 2.5px;*/
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+}
+
+#text-content{
+    resize: none;
+    width: 80%;
+    height: auto;
+
+}
+#Teksty button {
+    padding: 10px 20px;
+    background-color: #4CAF50; /* Green background */
+    color: white; /* White text */
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+#Teksty button:hover {
+    background-color: #45a049; /* Darker green background on hover */
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); /* Shadow effect on hover */
+}
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    padding: 10px;
+    color: white;
+    font-weight: bold;
+    width: 100%; /* Szerokość 100%, aby pokrywać całą szerokość ekranu */
+}
+
+.top-left-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.top-left-menu li {
+    display: inline-block; /* Poprawa wyświetlania elementów listy */
+    margin-right: 15px;
+}
+
+.top-left-menu a {
+    text-decoration: none;
+    color: white;
+    transition: color 0.3s;
+}
+
+.top-left-menu a:hover {
+    color: #ffcc00;
+    cursor: pointer;
+}
+
+.top-right-menu {
+    text-align: right;
+}
+
+.top-left-menu .dropdown-content {
+    margin-top: 10px;
+    display: none;
+    position: absolute;
+    background-color: #333;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Dodanie cienia */
+    z-index: 1;
+}
+
+.top-left-menu:hover .dropdown-content {
+    display: block; /* Pokaż zawartość menu rozwijanego po najechaniu myszką */
+}
+
+.top-left-menu .dropdown-content a {
+    color: white;
+    padding: 12px 16px;
+    display: block;
+    text-decoration: none;
+}
+
+.top-left-menu .dropdown-content a:hover {
+    background-color: #555;
+}
+
+.top-right-menu {
+    text-align: right;
+}
+
+/* Add styling for the new dropdown content */
+.top-left-menu .dropdown-content {
+    margin-top: 10px; /* Add margin-top for space between the top bar and expanded menu */
+}
+
+.top-left-menu .dropdown-content a:hover {
+    background-color: #555; /* You can change the background color on hover */
+}
+
+#Wyloguj {
+    background-color: #333; /* You can change the background color */
+    color: white; /* You can change the text color */
+    border: none;
+    border-radius: 8px; /* Add rounded edges */
+    padding: 5px 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+
+
+#authButton{
+    background-color: #333; /* You can change the background color */
+    color: white; /* You can change the text color */
+    border: none;
+    border-radius: 8px; /* Add rounded edges */
+    padding: 5px 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: color 0.3s; /* Add smooth transition for color change */
+
+}
+
+#authButton:hover {
+    color: #ffcc00; /* You can change the highlight color on hover */
+}
+
+#Wyloguj:hover {
+    background-color: #555; /* You can change the background color on hover */
+}

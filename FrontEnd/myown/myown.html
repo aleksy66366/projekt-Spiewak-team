@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Test Own Text</title>
+    <link rel="stylesheet" href="/myown/myown.css">
+    <script src="/main/logoutNotification.js" defer></script>
+
+
+</head>
+
+<body>
+<header>
+    <nav class="top-left-menu">
+        <ul>
+            <li id="home-link">Home</li>
+            <li class="dropdown" id="dodajtekst">Dodaj tekst</li>
+            <li id="zatrudniaj">Zatrudniaj</li>
+            <li id="edytujtekst">Edytuj tekst</li>
+            <li id="wlasny">Wlasny tekst</li>
+
+        </ul>
+    </nav>
+    <div class="top-right-menu">
+        <!-- <input id="Wyloguj" type="submit" value="Wyloguj się"> -->
+        <button id="authButton">Zaloguj</button>
+    </div>
+</header>
+<div id="Teksty">
+ <p>Oryginał:<p>
+<select id="text-title-select" onchange="selectText()"></select>
+<br>
+ <p>Edytuj:<p>
+<input type="text" id="text-title" placeholder="Tytuł Tekstu">
+<br>
+<textarea id="text-content" placeholder="Treść Tekstu" style="height: 300px;"></textarea>
+<br>
+<button onclick="addText()">Dodaj</button>
+<button onclick="editText()">Edytuj</button>
+<button onclick="deleteText()">Usuń</button>
+</div>
+<script>
+    // Funkcje JavaScript do obsługi zdarzeń
+    let selectedTextId = null;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        fetchTextTitles();
+
+        var homeLink = document.getElementById('home-link');
+        homeLink.onclick = function () {
+            window.location.href = '/'; // Replace with your main page URL
+        };
+
+        var dodajtekst = document.getElementById('dodajtekst');
+        dodajtekst.onclick = function () {
+            // Assuming '/add-owntext' is the correct URL
+            window.location.href = '/My-Custom-Text';
+        };
+
+        var edytujtekst = document.getElementById('edytujtekst');
+        edytujtekst.onclick = function () {
+            window.location.href = '/editLessons'; // Replace with your edit page URL
+        };
+
+        var zatrudniajLink = document.getElementById('zatrudniaj');
+        zatrudniajLink.onclick = function () {
+            window.location.href = '/users'; // Replace with the URL for "zatrudnij"
+        };
+        var wlasny = document.getElementById('wlasny');
+        wlasny.onclick = function () {
+            window.location.href = '/custom';
+        };
+    });
+
+    function fetchTextTitles() {
+        fetch('http://localhost:3000/get-texts-for-user')
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById('text-title-select');
+                select.innerHTML = '';
+                data.forEach(text => {
+                    const option = document.createElement('option');
+                    option.value = text.owntexts_id;
+                    option.textContent = text.owntexts_name;
+                    select.appendChild(option);
+                });
+            });
+    }
+
+    function selectText() {
+        const select = document.getElementById('text-title-select');
+        selectedTextId = select.value;
+
+        fetch(`http://localhost:3000/get-owntext/${selectedTextId}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('text-title').value = select.options[select.selectedIndex].text;
+                document.getElementById('text-content').value = data[0] && data[0].owntexts_text || '';
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function addText() {
+        const title = document.getElementById('text-title').value;
+        const content = document.getElementById('text-content').value;
+
+        fetch('http://localhost:3000/add-owntext', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ textTitleToAddForOwn: title, textToAddForOwn: content })
+        })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                fetchTextTitles(); // Odświeżenie listy tytułów
+            });
+    }
+
+    function editText() {
+        if (!selectedTextId) {
+            alert('Wybierz tekst do edycji!');
+            return;
+        }
+
+        const title = document.getElementById('text-title').value;
+        const content = document.getElementById('text-content').value;
+
+        fetch(`http://localhost:3000/edit-owntext/${selectedTextId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ textTitleToAddForOwn: title, textToAddForOwn: content })
+        })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+            });
+    }
+
+    function deleteText() {
+        if (!selectedTextId) {
+            alert('Wybierz tekst do usunięcia!');
+            return;
+        }
+
+        fetch(`http://localhost:3000/delete-owntext/${selectedTextId}`, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                fetchTextTitles(); // Odświeżenie listy tytułów
+            });
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Sprawdzenie statusu użytkownika po załadowaniu strony
+        fetch('/user-status')
+            .then(response => response.json())
+            .then(data => {
+                const button = document.getElementById("authButton");
+
+                if (data.isLoggedIn) {
+                    // Użytkownik zalogowany
+                    button.textContent = 'Wyloguj';
+                    button.onclick = function() {
+                        showLogoutNotification();
+                        window.location.href = '/logout';
+                    };
+                    dodajtekst.style.display = 'none';
+                    wlasny.style.display = 'inline';
+                    if(data.isAdmin){
+                        edytujtekst.style.display = 'none';
+                        zatrudniaj.style.display = 'inline';
+
+                    }else{
+                        edytujtekst.style.display = 'none';
+                        zatrudniaj.style.display = 'none';
+                    }
+                } else {
+                    // Użytkownik niezalogowany
+                    button.textContent = 'Zaloguj';
+                    button.onclick = function() {
+                        window.location.href = '/login';
+                    };
+                    edytujtekst.style.display = 'none';
+                    zatrudniaj.style.display = 'none';
+                    dodajtekst.style.display = 'none';
+                    wlasny.style.display = 'none';
+
+
+                }
+            })
+            .catch(error => {
+                console.error('Błąd podczas sprawdzania statusu użytkownika:', error);
+            });
+    });
+</script>
+</body>
+
+</html>

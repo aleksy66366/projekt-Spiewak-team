@@ -5,7 +5,21 @@
     <link rel="stylesheet" href="editLesson.css">
 </head>
 <body>
+<header>
+          <nav class="top-bar">
+              <ul>
+                  <li id="home-link">Home</li>
+                  <li class="dropdown" id="dodajtekst">Dodaj tekst</li>
+                  <li id="zatrudnij">Zatrudnij</li>
+                  <li id="wlasny">Wlasny tekst</li>
+              </ul>
+
+          </nav>
+      </header>
+
 <h1>Edycja Lekcji i Tekstów</h1>
+
+
 
 <div>
     <h2>Lekcje</h2>
@@ -169,6 +183,26 @@
                 loadTexts();
             });
     }
+
+    var homeLink = document.getElementById('home-link');
+    homeLink.onclick = function () {
+        window.location.href = '/'; // Replace with your main page URL
+    };
+
+    var dodajtekst = document.getElementById('dodajtekst');
+    dodajtekst.onclick = function () {
+        window.location.href = '/My-Custom-Text';
+    };
+
+    var zatrudnij = document.getElementById('zatrudnij');
+    zatrudnij.onclick = function () {
+        window.location.href = '/users'; // Replace with the appropriate URL for hiring
+    };
+    var wlasny = document.getElementById('wlasny');
+    wlasny.onclick = function () {
+        window.location.href = '/customt';
+    };
+
 </script>
 </body>
 </html>
